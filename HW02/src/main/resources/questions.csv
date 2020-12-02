@@ -1,0 +1,24 @@
+Question:Какого окраса был кот Леопольд?
+AnswerTrue:Рыжий
+AnswerFalse:Серый
+AnswerFalse:Черный
+AnswerFalse:Белый
+Question:Какие цифры присутствовали в номере дома в котором жил кот Леопольд?
+AnswerTrue:8
+AnswerTrue:16
+AnswerFalse:3
+AnswerFalse:1
+AnswerFalse:2
+Question:Какие качества не относятся к коту Леопольду?
+AnswerTrue:Курит
+AnswerTrue:Пьет алкоголь
+AnswerFalse:Обижает мышей
+AnswerFalse:Со всеми дружит
+AnswerFalse:Мяукает
+Question:Сколько мышей жило в доме у кота Леопольда?
+AnswerTrue:2
+AnswerFalse:Нисколько
+AnswerFalse:5
+AnswerFalse:Неизвестно
+Question:Напишите название улицы на которой жил кот Леопольд?
+AnswerInput:Мяукино
