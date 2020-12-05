@@ -1,23 +1,23 @@
-package ru.otus.homework.service;
+package ru.otus.homework.service.impl;
 
 import static java.lang.String.format;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import ru.otus.homework.model.Answer;
 import ru.otus.homework.model.Question;
+import ru.otus.homework.service.RunnerQuests;
 
-@Component
+@Service
 public class RunnerQuestsImpl implements RunnerQuests {
 
     private static final String HELLO = "Hello! Let's start our Quest!!!";
@@ -31,21 +31,22 @@ public class RunnerQuestsImpl implements RunnerQuests {
     private static final String ANSWER_TRUE = "AnswerTrue:";
     private static final String ANSWER_FALSE = "AnswerFalse:";
     private static final String ANSWER_INPUT = "AnswerInput:";
-
-    @Value("${pathFileQuestions}")
-    private String pathFileQuestions;
+    private static final String ENTER_ANSWER = "Enter your answer:" + System.lineSeparator();
 
     @Value("${minimumNumberOfCorrectAnswers}")
     private int minimumNumberOfCorrectAnswers;
 
+    private final BufferedReaderHelperImpl bufferedReaderHelper;
+
+    public RunnerQuestsImpl(BufferedReaderHelperImpl bufferedReaderHelper) {
+        this.bufferedReaderHelper = bufferedReaderHelper;
+    }
+
+    @Override
     public List<Question> readQuestions() {
         List<Question> questionList = new ArrayList<>();
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        InputStream inputStream = classloader.getResourceAsStream(pathFileQuestions);
         try {
-            InputStreamReader streamReader =
-                    new InputStreamReader(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
-            BufferedReader reader = new BufferedReader(streamReader);
+            BufferedReader reader = bufferedReaderHelper.getBufferedReader();
             Question question = null;
             List<Answer> answerList = new ArrayList<>();
             for (String line; (line = reader.readLine()) != null; ) {
@@ -94,31 +95,83 @@ public class RunnerQuestsImpl implements RunnerQuests {
             questionList.add(question);
         }
         catch (IOException exception) {
-            System.out.println(exception.getMessage());
+            exception.printStackTrace();
         }
+        bufferedReaderHelper.closeBufferedReader();
         return questionList;
     }
 
     @Override
-    public void runQuest() throws IOException {
+    public void runQuest() {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println(HELLO);
         System.out.println(WHATS_YOUR_FIRST_NAME);
-        String firstName = reader.readLine();
+        String firstName = null;
+        try {
+            firstName = reader.readLine();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println(WHATS_YOUR_SECOND_NAME);
-        String secondName = reader.readLine();
+        String secondName = null;
+        try {
+            secondName = reader.readLine();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println(format(LET_S_GO, firstName, secondName) + System.lineSeparator());
         List<Question> questionList = readQuestions();
         int rightAnswers = 0;
         for (Question question : questionList) {
-            rightAnswers += question.askQuestion(reader);
+            rightAnswers += askQuestion(question, reader);
         }
         if (rightAnswers >= minimumNumberOfCorrectAnswers) {
             System.out.println(SUPER);
         } else {
             System.out.println(SORRY);
         }
-        reader.close();
+        try {
+            reader.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public int askQuestion(Question question, BufferedReader reader) {
+        System.out.println(question);
+        System.out.println(ENTER_ANSWER);
+        String answer;
+        try {
+            answer = reader.readLine();
+        }
+        catch (IOException e) {
+            answer = "";
+        }
+        int rightAnswers = 0;
+        int allRightAnswers = 0;
+        if (question.getAnswers().size() == 1) {
+            allRightAnswers++;
+            if (answer.equals(question.getAnswers().get(0).getTextOfAnswer())) {
+                rightAnswers = 1;
+            }
+        } else {
+            AtomicInteger counter = new AtomicInteger(0);
+            for (Answer element : question.getAnswers()) {
+                int currentNumber = counter.incrementAndGet();
+                if (element.isRightAnswer()) {
+                    allRightAnswers++;
+                    if (answer.contains(String.valueOf(currentNumber))) {
+                        rightAnswers++;
+                    }
+                }
+            }
+        }
+        System.out.println(rightAnswers + " / " + allRightAnswers + System.lineSeparator());
+        return rightAnswers;
     }
 }
