@@ -1,0 +1,8 @@
+${AnsiColor.BLUE}
+${AnsiColor.BLUE} ,-.  .              ,-.                      ,-.   ,-.  ,-.   ,-.     ,  ,
+${AnsiColor.BLUE}/   \ |             (   `         o              ) /  /\    ) /  /\   '| '|
+${AnsiColor.BLUE}|   | |-  . . ,-.    `-.  ;-. ;-. . ;-. ,-:     /  | / |   /  | / |    |  |
+${AnsiColor.BLUE}\   / |   | | `-.   .   ) | | |   | | | | |    /   \/  /  /   \/  /    |  |
+${AnsiColor.BLUE} `-'  `-' `-` `-' o  `-'  |-' '   ' ' ' `-| o '--'  `-'  '--'  `-'  o  '  '
+${AnsiColor.BLUE}                          '             `-'${AnsiColor.BLACK}
+
