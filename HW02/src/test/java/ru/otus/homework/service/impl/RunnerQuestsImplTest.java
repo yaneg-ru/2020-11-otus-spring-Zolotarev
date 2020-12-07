@@ -45,7 +45,7 @@ class RunnerQuestsImplTest {
         catch (IOException e) {
             e.printStackTrace();
         }
-        when(bufferedReaderHelper.getBufferedReader()).thenReturn(bufferedReader);
+        when(bufferedReaderHelper.getBufferedReaderFromFile()).thenReturn(bufferedReader);
         List<Answer> expectedAnswers = new ArrayList<>();
         expectedAnswers.add(Answer.builder()
                             .isRightAnswer(true)

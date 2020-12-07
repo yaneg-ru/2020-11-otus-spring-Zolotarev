@@ -15,22 +15,25 @@ import ru.otus.homework.service.BufferedReaderHelper;
 @Service
 public class BufferedReaderHelperImpl implements BufferedReaderHelper {
 
-    private BufferedReader reader;
-
     @Value("${pathFileQuestions}")
     private String pathFileQuestions;
 
     @Override
-    public BufferedReader getBufferedReader() {
+    public BufferedReader getBufferedReaderFromSystemIn() {
+        return new BufferedReader(new InputStreamReader(System.in));
+    }
+
+    @Override
+    public BufferedReader getBufferedReaderFromFile() {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream inputStream = classloader.getResourceAsStream(pathFileQuestions);
         InputStreamReader streamReader =
                 new InputStreamReader(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
-        return reader = new BufferedReader(streamReader);
+        return new BufferedReader(streamReader);
     }
 
     @Override
-    public void closeBufferedReader() {
+    public void closeBufferedReader(BufferedReader reader) {
         try {
             reader.close();
         }

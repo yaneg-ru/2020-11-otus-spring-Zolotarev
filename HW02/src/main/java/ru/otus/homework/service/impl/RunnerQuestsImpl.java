@@ -4,7 +4,6 @@ import static java.lang.String.format;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +45,7 @@ public class RunnerQuestsImpl implements RunnerQuests {
     public List<Question> readQuestions() {
         List<Question> questionList = new ArrayList<>();
         try {
-            BufferedReader reader = bufferedReaderHelper.getBufferedReader();
+            BufferedReader reader = bufferedReaderHelper.getBufferedReaderFromFile();
             Question question = null;
             List<Answer> answerList = new ArrayList<>();
             for (String line; (line = reader.readLine()) != null; ) {
@@ -93,18 +92,18 @@ public class RunnerQuestsImpl implements RunnerQuests {
             }
             Objects.requireNonNull(question).setAnswers(answerList);
             questionList.add(question);
+            bufferedReaderHelper.closeBufferedReader(reader);
         }
         catch (IOException exception) {
             exception.printStackTrace();
         }
-        bufferedReaderHelper.closeBufferedReader();
         return questionList;
     }
 
     @Override
     public void runQuest() {
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        var reader = bufferedReaderHelper.getBufferedReaderFromSystemIn();
         System.out.println(HELLO);
         System.out.println(WHATS_YOUR_FIRST_NAME);
         String firstName = null;
