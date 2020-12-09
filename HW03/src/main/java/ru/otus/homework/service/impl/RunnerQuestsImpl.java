@@ -102,20 +102,22 @@ public class RunnerQuestsImpl implements RunnerQuests {
         var reader = bufferedReaderHelper.getBufferedReaderFromSystemIn();
         System.out.println(HELLO);
         System.out.println(WHATS_YOUR_FIRST_NAME);
-        String firstName = null;
+        String firstName;
         try {
             firstName = reader.readLine();
         }
         catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
         }
         System.out.println(WHATS_YOUR_SECOND_NAME);
-        String secondName = null;
+        String secondName;
         try {
             secondName = reader.readLine();
         }
         catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
         }
         System.out.println(format(LET_S_GO, firstName, secondName) + System.lineSeparator());
         List<Question> questionList = readQuestions();
