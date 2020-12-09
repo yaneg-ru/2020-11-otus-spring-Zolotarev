@@ -12,12 +12,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.otus.homework.config.AppProps;
 import ru.otus.homework.model.Answer;
+import ru.otus.homework.model.factory.AnswerFactory;
 import ru.otus.homework.model.Question;
+import ru.otus.homework.model.factory.QuestionFactory;
 import ru.otus.homework.service.RunnerQuests;
 
 @Service
+@Slf4j
 public class RunnerQuestsImpl implements RunnerQuests {
 
     private static final String HELLO = "Hello! Let's start our Quest!!!";
@@ -27,10 +31,10 @@ public class RunnerQuestsImpl implements RunnerQuests {
     private static final String SUPER = "Super! You are done it!";
     private static final String SORRY = "Sorry! But you are stupid!";
 
-    private static final String QUESTION = "Question:";
-    private static final String ANSWER_TRUE = "AnswerTrue:";
-    private static final String ANSWER_FALSE = "AnswerFalse:";
-    private static final String ANSWER_INPUT = "AnswerInput:";
+    public static final String QUESTION = "Question:";
+    public static final String ANSWER_TRUE = "AnswerTrue:";
+    public static final String ANSWER_FALSE = "AnswerFalse:";
+    public static final String ANSWER_INPUT = "AnswerInput:";
     private static final String ENTER_ANSWER = "Enter your answer:" + System.lineSeparator();
 
     private final BufferedReaderHelperImpl bufferedReaderHelper;
@@ -45,8 +49,10 @@ public class RunnerQuestsImpl implements RunnerQuests {
     }
 
     @Override
-    public List<Question> readQuestions() {
+    public List<Question> readQuestions() throws IOException {
         List<Question> questionList = new ArrayList<>();
+        QuestionFactory questionFactory = new QuestionFactory(appProps, messageSource);
+        AnswerFactory answerFactory = new AnswerFactory(appProps, messageSource);
         try {
             BufferedReader reader = bufferedReaderHelper.getBufferedReaderFromFile();
             Question question = null;
@@ -54,72 +60,29 @@ public class RunnerQuestsImpl implements RunnerQuests {
             for (String line; (line = reader.readLine()) != null; ) {
                 // found first question in file
                 if (line.startsWith(QUESTION) && question == null) {
-                    question = Question.builder()
-                            .textOfQuestion(
-                                    messageSource.getMessage(
-                                            line.substring(QUESTION.length()),
-                                            null,
-                                            appProps.getLocale()
-                                    )
-                            )
-                            .build();
+                    question = questionFactory.createQuizItem(QUESTION, line);
                     continue;
                 }
                 // found second question in file
                 if (line.startsWith(QUESTION) && question != null) {
                     question.setAnswers(answerList);
                     questionList.add(question);
-                    question = Question.builder()
-                            .textOfQuestion(
-                                    messageSource.getMessage(
-                                            line.substring(QUESTION.length()),
-                                            null,
-                                            appProps.getLocale()
-                                    )
-                            )
-                            .build();
+                    question = questionFactory.createQuizItem(QUESTION, line);
                     answerList = new ArrayList<>();
                 }
                 // found true answer in file
                 if (line.startsWith(ANSWER_TRUE)) {
-                    Answer answer = Answer.builder()
-                            .textOfAnswer(
-                                    messageSource.getMessage(
-                                            line.substring(ANSWER_TRUE.length()),
-                                            null,
-                                            appProps.getLocale()
-                                    )
-                            )
-                            .isRightAnswer(true)
-                            .build();
+                    Answer answer = answerFactory.createQuizItem(ANSWER_TRUE, line);
                     answerList.add(answer);
                 }
                 // found input answer in file
                 if (line.startsWith(ANSWER_INPUT)) {
-                    Answer answer = Answer.builder()
-                            .textOfAnswer(
-                                    messageSource.getMessage(
-                                            line.substring(ANSWER_INPUT.length()),
-                                            null,
-                                            appProps.getLocale()
-                                    )
-                            )
-                            .isInputAnswer(true)
-                            .build();
+                    Answer answer = answerFactory.createQuizItem(ANSWER_INPUT, line);
                     answerList.add(answer);
                 }
                 // found false answer in file
                 if (line.startsWith(ANSWER_FALSE)) {
-                    Answer answer = Answer.builder()
-                            .textOfAnswer(
-                                    messageSource.getMessage(
-                                            line.substring(ANSWER_FALSE.length()),
-                                            null,
-                                            appProps.getLocale()
-                                    )
-                            )
-                            .isRightAnswer(false)
-                            .build();
+                    Answer answer = answerFactory.createQuizItem(ANSWER_FALSE, line);
                     answerList.add(answer);
                 }
             }
@@ -128,13 +91,14 @@ public class RunnerQuestsImpl implements RunnerQuests {
             bufferedReaderHelper.closeBufferedReader(reader);
         }
         catch (IOException exception) {
-            exception.printStackTrace();
+            log.error(exception.getMessage());
+            throw  exception;
         }
         return questionList;
     }
 
     @Override
-    public void runQuest() {
+    public void runQuest() throws IOException {
         var reader = bufferedReaderHelper.getBufferedReaderFromSystemIn();
         System.out.println(HELLO);
         System.out.println(WHATS_YOUR_FIRST_NAME);
@@ -168,7 +132,8 @@ public class RunnerQuestsImpl implements RunnerQuests {
             reader.close();
         }
         catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
         }
     }
 
@@ -181,6 +146,7 @@ public class RunnerQuestsImpl implements RunnerQuests {
             answer = reader.readLine();
         }
         catch (IOException e) {
+            log.error(e.getMessage());
             answer = "";
         }
         int rightAnswers = 0;

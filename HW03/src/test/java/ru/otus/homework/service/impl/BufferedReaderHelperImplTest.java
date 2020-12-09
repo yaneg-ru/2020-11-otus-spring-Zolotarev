@@ -37,7 +37,7 @@ class BufferedReaderHelperImplTest {
     BufferedReader bufferedReader;
 
     @Test
-    void readQuestions_shouldReadOneQuestion_whenInFileOnlyOneQuestion() {
+    void readQuestions_shouldReadOneQuestion_whenInFileOnlyOneQuestion() throws IOException {
         try {
             when(bufferedReader.readLine())
                     .thenReturn("Question:question1")

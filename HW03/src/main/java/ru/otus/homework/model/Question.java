@@ -1,7 +1,6 @@
 package ru.otus.homework.model;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -10,9 +9,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class Question {
+public class Question implements QuizItem {
 
-    private String textOfQuestion;
+    private final String textOfQuestion;
     private List<Answer> answers;
 
     @Override
@@ -26,23 +25,5 @@ public class Question {
                 .map(s -> counter.incrementAndGet() + " - " + s)
                 .collect(Collectors.joining(System.lineSeparator()))
                 + System.lineSeparator();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Question)) {
-            return false;
-        }
-        Question question = (Question) o;
-        return Objects.equals(textOfQuestion, question.textOfQuestion) &&
-                Objects.equals(answers, question.answers);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(textOfQuestion, answers);
     }
 }

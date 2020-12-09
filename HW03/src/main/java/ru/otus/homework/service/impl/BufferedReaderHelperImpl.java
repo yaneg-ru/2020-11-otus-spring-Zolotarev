@@ -11,10 +11,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.otus.homework.config.AppProps;
 import ru.otus.homework.service.BufferedReaderHelper;
 
 @Service
+@Slf4j
 public class BufferedReaderHelperImpl implements BufferedReaderHelper {
 
     private final AppProps appProps;
@@ -31,14 +33,15 @@ public class BufferedReaderHelperImpl implements BufferedReaderHelper {
     }
 
     @Override
-    public BufferedReader getBufferedReaderFromFile() {
+    public BufferedReader getBufferedReaderFromFile() throws IOException {
         Resource resource = resourceLoader.getResource(appProps.getPathFile());
-        InputStream inputStream = null;
+        InputStream inputStream;
         try {
             inputStream = resource.getInputStream();
         }
         catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
         }
         InputStreamReader streamReader =
                 new InputStreamReader(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
@@ -46,12 +49,13 @@ public class BufferedReaderHelperImpl implements BufferedReaderHelper {
     }
 
     @Override
-    public void closeBufferedReader(BufferedReader reader) {
+    public void closeBufferedReader(BufferedReader reader) throws IOException {
         try {
             reader.close();
         }
         catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            throw e;
         }
     }
 }
