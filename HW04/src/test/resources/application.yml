@@ -1,0 +1,9 @@
+questions:
+  pathFile: "classpath:questions.csv"
+  minimumNumberOfCorrectAnswers: 3
+  locale: ru_RU
+
+spring:
+  shell:
+    interactive:
+      enabled: false
