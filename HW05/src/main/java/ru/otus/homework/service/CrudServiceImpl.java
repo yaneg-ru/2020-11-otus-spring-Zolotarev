@@ -13,7 +13,7 @@ import ru.otus.homework.domain.BaseNamedEntity;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class CrudServiceImpl<E extends BaseNamedEntity, R extends EntityDao<E>> implements CrudService<E> {
+public abstract class CrudServiceImpl<E extends BaseNamedEntity, R extends EntityDao<E>> implements CrudService<E> {
 
     public static final String START_GETTING_COUNT_OF_ENTITIES = "Start getting count of entities";
     public static final String START_CREATING = "Start creating {}: {}";
