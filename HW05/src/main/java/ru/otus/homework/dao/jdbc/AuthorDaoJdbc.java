@@ -41,13 +41,13 @@ public class AuthorDaoJdbc implements EntityDao<Author> {
     public Author getById(Long id) {
         Map<String, Object> params = Collections.singletonMap("id", id);
         return namedParameterJdbcOperations.queryForObject(
-                "select * from author where id = :id", params, new AuthorMapper()
+                "select id, name from author where id = :id", params, new AuthorMapper()
         );
     }
 
     @Override
     public List<Author> getAll() {
-        return jdbc.query("select * from author", new AuthorMapper());
+        return jdbc.query("select id, name from author", new AuthorMapper());
     }
 
     @Override

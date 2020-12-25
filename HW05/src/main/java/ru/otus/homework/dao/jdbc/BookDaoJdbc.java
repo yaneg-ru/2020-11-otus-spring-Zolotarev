@@ -14,7 +14,9 @@ import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
 import ru.otus.homework.dao.EntityDao;
+import ru.otus.homework.domain.Author;
 import ru.otus.homework.domain.Book;
+import ru.otus.homework.domain.Genre;
 
 @SuppressWarnings({"SqlNoDataSourceInspection", "ConstantConditions", "SqlDialectInspection"})
 @Repository
@@ -23,8 +25,6 @@ public class BookDaoJdbc implements EntityDao<Book> {
 
     private final JdbcOperations jdbc;
     private final NamedParameterJdbcOperations namedParameterJdbcOperations;
-    private final AuthorDaoJdbc authorDaoJdbc;
-    private final GenreDaoJdbc genreDaoJdbc;
 
     @Override
     public int count() {
@@ -43,21 +43,41 @@ public class BookDaoJdbc implements EntityDao<Book> {
         Map<String, Object> params = Collections.singletonMap("id", id);
         try {
             return namedParameterJdbcOperations.queryForObject(
-                    "select * from book where id = :id", params, new BookMapper());
-        } catch (EmptyResultDataAccessException e) {
+                    "select book.id as book_id, book.name as book_name, "
+                            + "author.id as author_id, author.name as author_name, "
+                            + "genre.id as genre_id, genre.name as genre_name from book "
+                            + "join author on author.id = book.author_id "
+                            + "join genre on genre.id = book.genre_id "
+                            + "where book.id = :id", params,
+                    new BookMapper()
+            );
+        }
+        catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
 
     @Override
     public List<Book> getAll() {
-        return jdbc.query("select * from book", new BookMapper());
+        return jdbc.query(
+                "select book.id as book_id, book.name as book_name, "
+                        + "author.id as author_id, author.name as author_name, "
+                        + "genre.id as genre_id, genre.name as genre_name from book "
+                        + "join author on author.id = book.author_id "
+                        + "join genre on genre.id = book.genre_id ",
+                new BookMapper()
+        );
     }
 
     public List<Book> getAllByGenre(Long genreId) {
         Map<String, Object> params = Collections.singletonMap("id", genreId);
         return namedParameterJdbcOperations.query(
-                "select * from book where genre_id = :id", params, new BookMapper()
+                "select book.id as book_id, book.name as book_name, "
+                        + "author.id as author_id, author.name as author_name, "
+                        + "genre.id as genre_id, genre.name as genre_name from book "
+                        + "join author on author.id = book.author_id "
+                        + "join genre on genre.id = book.genre_id "
+                        + "where genre.id = :id", params, new BookMapper()
         );
 
     }
@@ -65,7 +85,12 @@ public class BookDaoJdbc implements EntityDao<Book> {
     public List<Book> getAllByAuthor(Long authorId) {
         Map<String, Object> params = Collections.singletonMap("id", authorId);
         return namedParameterJdbcOperations.query(
-                "select * from book where author_id = :id", params, new BookMapper()
+                "select book.id as book_id, book.name as book_name, "
+                        + "author.id as author_id, author.name as author_name, "
+                        + "genre.id as genre_id, genre.name as genre_name from book "
+                        + "join author on author.id = book.author_id "
+                        + "join genre on genre.id = book.genre_id "
+                        + "where author.id = :id", params, new BookMapper()
         );
     }
 
@@ -75,14 +100,22 @@ public class BookDaoJdbc implements EntityDao<Book> {
         namedParameterJdbcOperations.update("delete from book where id = :id", params);
     }
 
-    private class BookMapper implements RowMapper<Book> {
+    private static class BookMapper implements RowMapper<Book> {
         @Override
         public Book mapRow(ResultSet resultSet, int i) throws SQLException {
+            Author author = Author.builder()
+                    .id((Long) resultSet.getObject("author_id"))
+                    .name(resultSet.getString("author_name"))
+                    .build();
+            Genre genre = Genre.builder()
+                    .id((Long) resultSet.getObject("genre_id"))
+                    .name(resultSet.getString("genre_name"))
+                    .build();
             return Book.builder()
-                    .id((Long) resultSet.getObject("id"))
-                    .name(resultSet.getString("name"))
-                    .author(authorDaoJdbc.getById((Long) resultSet.getObject("author_id")))
-                    .genre(genreDaoJdbc.getById((Long) resultSet.getObject("genre_id")))
+                    .id((Long) resultSet.getObject("book_id"))
+                    .name(resultSet.getString("book_name"))
+                    .author(author)
+                    .genre(genre)
                     .build();
         }
     }

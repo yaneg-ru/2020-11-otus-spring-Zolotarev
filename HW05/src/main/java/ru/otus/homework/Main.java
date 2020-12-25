@@ -9,6 +9,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 @SpringBootApplication
 public class Main {
 
+    @SuppressWarnings("unused")
     public ApplicationEventMulticaster applicationEventMulticaster() {
         SimpleApplicationEventMulticaster eventMulticaster = new SimpleApplicationEventMulticaster();
         eventMulticaster.setTaskExecutor(new SimpleAsyncTaskExecutor());
