@@ -45,7 +45,7 @@ public class Book extends BaseNamedEntity {
 
     @Fetch(value = FetchMode.SELECT)
     @BatchSize(size = 5)
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private List<Comment> comments;
 }

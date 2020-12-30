@@ -7,6 +7,7 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import ru.otus.homework.dao.jpa.BookDaoJpa;
@@ -30,11 +31,13 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
 
     @ShellMethod(value = "Count books", key = {"cb"})
     @Override
+    @Transactional(readOnly = true)
     public long count() {
         return super.count();
     }
 
     @ShellMethod(value = "Add book", key = {"ab"})
+    @Transactional
     public String createBook(@ShellOption String name, @ShellOption Long authorId,
                          @ShellOption Long genreId) {
         String result;
@@ -56,6 +59,7 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
     }
 
     @ShellMethod(value = "Update book", key = {"ub"})
+    @Transactional
     public String updateBook(@ShellOption Long bookId, @ShellOption String name,
                          @ShellOption Long authorId, @ShellOption Long genreId) {
         String result;
@@ -78,6 +82,7 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
     }
 
     @ShellMethod(value = "Get book by id", key = {"gbi"})
+    @Transactional(readOnly = true)
     public String getBookById(@ShellOption Long id) {
         Book foundBook = super.getById(id);
         if (foundBook != null) {
@@ -88,6 +93,7 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
     }
 
     @ShellMethod(value = "Get all books", key = {"gab"})
+    @Transactional(readOnly = true)
     public String getAllBooks() {
         List<Book> foundBooks = super.getAll();
         if (!foundBooks.isEmpty()) {
@@ -100,10 +106,12 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
     }
 
     @ShellMethod(value = "Get all books by genreId", key = {"gabg"})
+    @Transactional(readOnly = true)
     public String getAllByGenre(@ShellOption Long genreId) {
-        List<Book> foundBooks = super.repository.getAllByGenre(genreId);
+        List<Book> foundBooks = super.repository.getAll();
         if (!foundBooks.isEmpty()) {
             return foundBooks.stream()
+                    .filter(book -> book.getGenre().getId().equals(genreId))
                     .map(Book::toString)
                     .collect(Collectors.joining(System.lineSeparator()));
         } else {
@@ -112,10 +120,12 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
     }
 
     @ShellMethod(value = "Get all books by authorId", key = {"gaba"})
+    @Transactional(readOnly = true)
     public String getAllByAuthor(@ShellOption Long authorId) {
-        List<Book> foundBooks = super.repository.getAllByAuthor(authorId);
+        List<Book> foundBooks = super.repository.getAll();
         if (!foundBooks.isEmpty()) {
             return foundBooks.stream()
+                    .filter(book -> book.getAuthor().getId().equals(authorId))
                     .map(Book::toString)
                     .collect(Collectors.joining(System.lineSeparator()));
         } else {
@@ -124,6 +134,7 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
     }
 
     @ShellMethod(value = "Delete book by id", key = {"db"})
+    @Transactional(readOnly = true)
     public String deleteBookById(@ShellOption Long id) {
         try {
             super.deleteById(id);

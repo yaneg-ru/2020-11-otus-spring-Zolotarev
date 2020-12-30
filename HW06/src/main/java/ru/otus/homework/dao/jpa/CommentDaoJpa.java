@@ -3,6 +3,7 @@ package ru.otus.homework.dao.jpa;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -44,17 +45,8 @@ public class CommentDaoJpa implements EntityDao<Comment> {
         return query.getResultList();
     }
 
-    @SuppressWarnings("unused")
-    public List<Comment> getAllByBookId(Long bookId) {
-        var query = em.createQuery("select c from Comment c where c.bookId=:bookId", Comment.class);
-        query.setParameter("bookId", bookId);
-        return query.getResultList();
-    }
-
     @Override
     public void deleteById(Long id) {
-        Query query = em.createQuery("delete from Comment c where c.id=:id");
-        query.setParameter("id", id);
-        query.executeUpdate();
+        em.remove(getById(id).orElseThrow(EntityExistsException::new));
     }
 }

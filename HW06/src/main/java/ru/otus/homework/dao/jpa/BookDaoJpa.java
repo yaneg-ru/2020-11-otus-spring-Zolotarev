@@ -3,6 +3,7 @@ package ru.otus.homework.dao.jpa;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -49,27 +50,9 @@ public class BookDaoJpa implements EntityDao<Book> {
         return query.getResultList();
     }
 
-    public List<Book> getAllByGenre(Long genreId) {
-        var query = em.createQuery("select b from Book b where b.genre.id=:genreId", Book.class);
-        EntityGraph<?> entityGraph = em.getEntityGraph("book-entity-graph");
-        query.setHint("javax.persistence.fetchgraph", entityGraph);
-        query.setParameter("genreId", genreId);
-        return query.getResultList();
-    }
-
-    public List<Book> getAllByAuthor(Long authorId) {
-        var query = em.createQuery("select b from Book b where b.author.id=:authorId", Book.class);
-        EntityGraph<?> entityGraph = em.getEntityGraph("book-entity-graph");
-        query.setHint("javax.persistence.fetchgraph", entityGraph);
-        query.setParameter("authorId", authorId);
-        return query.getResultList();
-    }
-
     @Override
     public void deleteById(Long id) {
-        Query query = em.createQuery("delete from Book b where b.id=:id");
-        query.setParameter("id", id);
-        query.executeUpdate();
+        em.remove(getById(id).orElseThrow(EntityExistsException::new));
     }
 
 }

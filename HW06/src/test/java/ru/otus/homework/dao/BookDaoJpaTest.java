@@ -86,18 +86,6 @@ class BookDaoJpaTest {
     }
 
     @Test
-    void getAllByAuthor_shouldGetOneBook_whenThereIsOneBookInDatabaseByPassedAuthorId() {
-        List<Book> actualBooks = repositoryBook.getAllByAuthor(EXISTING_AUTHOR_ID);
-        assertEquals(1, actualBooks.size());
-    }
-
-    @Test
-    void getAllByGenre_shouldGetOneBook_whenThereIsOneBookInDatabaseByPassedGenreId() {
-        List<Book> actualBooks = repositoryBook.getAllByGenre(EXISTING_GENRE_ID);
-        assertEquals(1, actualBooks.size());
-    }
-
-    @Test
     void deleteById_shouldDeleteBook_whenPassedValidBookId() {
         repositoryBook.deleteById(EXISTING_BOOK_ID);
         assertThrows(NoSuchElementException.class, repositoryBook.getById(EXISTING_BOOK_ID)::get);

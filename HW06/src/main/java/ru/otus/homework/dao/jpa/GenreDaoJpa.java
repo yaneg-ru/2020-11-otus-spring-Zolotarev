@@ -3,6 +3,7 @@ package ru.otus.homework.dao.jpa;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -46,8 +47,6 @@ public class GenreDaoJpa implements EntityDao<Genre> {
 
     @Override
     public void deleteById(Long id) {
-        Query query = em.createQuery("delete from Genre g where g.id=:id");
-        query.setParameter("id", id);
-        query.executeUpdate();
+        em.remove(getById(id).orElseThrow(EntityExistsException::new));
     }
 }

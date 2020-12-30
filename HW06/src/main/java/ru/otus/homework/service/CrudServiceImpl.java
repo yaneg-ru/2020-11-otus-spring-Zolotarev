@@ -5,7 +5,6 @@ import java.util.List;
 import javax.persistence.EntityExistsException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import ru.otus.homework.dao.EntityDao;
 import ru.otus.homework.domain.BaseNamedEntity;
 
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public abstract class CrudServiceImpl<E extends BaseNamedEntity, R extends EntityDao<E>> implements CrudService<E> {
 

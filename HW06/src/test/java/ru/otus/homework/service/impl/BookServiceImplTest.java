@@ -125,20 +125,20 @@ class BookServiceImplTest {
 
     @Test
     void getAllByGenre_shouldOneBook_whenAccordingWithPlannedBehavior() {
-        when(bookRepository.getAllByGenre(any())).thenReturn(List.of(book));
+        when(bookRepository.getAll()).thenReturn(List.of(book));
         var expectedListBook = book.toString();
         var actualListBook = service.getAllByGenre(genre.getId());
         assertEquals(expectedListBook, actualListBook);
-        verify(bookRepository, times(1)).getAllByGenre(any());
+        verify(bookRepository, times(1)).getAll();
     }
 
     @Test
     void getAllByAuthor_shouldOneBook_whenAccordingWithPlannedBehavior() {
-        when(bookRepository.getAllByAuthor(any())).thenReturn(List.of(book));
+        when(bookRepository.getAll()).thenReturn(List.of(book));
         var expectedListBook = book.toString();
         var actualListBook = service.getAllByAuthor(author.getId());
         assertEquals(expectedListBook, actualListBook);
-        verify(bookRepository, times(1)).getAllByAuthor(any());
+        verify(bookRepository, times(1)).getAll();
     }
 
     @Test
