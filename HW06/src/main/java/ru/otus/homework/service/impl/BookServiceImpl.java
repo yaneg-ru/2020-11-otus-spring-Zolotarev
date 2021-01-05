@@ -31,7 +31,6 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
 
     @ShellMethod(value = "Count books", key = {"cb"})
     @Override
-    @Transactional(readOnly = true)
     public long count() {
         return super.count();
     }
@@ -82,7 +81,6 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
     }
 
     @ShellMethod(value = "Get book by id", key = {"gbi"})
-    @Transactional(readOnly = true)
     public String getBookById(@ShellOption Long id) {
         Book foundBook = super.getById(id);
         if (foundBook != null) {
@@ -108,10 +106,9 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
     @ShellMethod(value = "Get all books by genreId", key = {"gabg"})
     @Transactional(readOnly = true)
     public String getAllByGenre(@ShellOption Long genreId) {
-        List<Book> foundBooks = super.repository.getAll();
+        List<Book> foundBooks = genreService.getById(genreId).getBooks();
         if (!foundBooks.isEmpty()) {
             return foundBooks.stream()
-                    .filter(book -> book.getGenre().getId().equals(genreId))
                     .map(Book::toString)
                     .collect(Collectors.joining(System.lineSeparator()));
         } else {
@@ -122,10 +119,9 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
     @ShellMethod(value = "Get all books by authorId", key = {"gaba"})
     @Transactional(readOnly = true)
     public String getAllByAuthor(@ShellOption Long authorId) {
-        List<Book> foundBooks = super.repository.getAll();
+        List<Book> foundBooks = authorService.getById(authorId).getBooks();
         if (!foundBooks.isEmpty()) {
             return foundBooks.stream()
-                    .filter(book -> book.getAuthor().getId().equals(authorId))
                     .map(Book::toString)
                     .collect(Collectors.joining(System.lineSeparator()));
         } else {
@@ -134,7 +130,7 @@ public class BookServiceImpl extends CrudServiceImpl<Book, BookDaoJpa> {
     }
 
     @ShellMethod(value = "Delete book by id", key = {"db"})
-    @Transactional(readOnly = true)
+    @Transactional
     public String deleteBookById(@ShellOption Long id) {
         try {
             super.deleteById(id);
